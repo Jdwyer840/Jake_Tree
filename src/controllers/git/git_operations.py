@@ -1,4 +1,5 @@
 import git
+# from repository_manager import GitRepositoryManager
 
 
 class GitOperationConstants:
@@ -7,6 +8,20 @@ class GitOperationConstants:
 
 
 class GitOperations:
+    repo: git.Repo = None
+
+    def __init__(self, repo_path: str):
+        self.set_git_repository(repo_path)
+
+    def set_git_repository(self, repo_path: str) -> None:
+        try:
+            self.repo = git.Repo(path=repo_path)
+        except git.InvalidGitRepositoryError as re:
+            print(f"git repo is not good son {str(re)}")
+            raise re
+
+    def get_git_repository(self):
+        return self.repo
 
     @staticmethod
     def get_current_local_branches(repo_path):
@@ -18,14 +33,46 @@ class GitOperations:
     def check_out_local_branch(repo_path: str, branch_name: str):
         #TODO find out a way o set the current repo use the new class repo manager
         repo = git.Repo(repo_path)
+        # repo.
         repo.git.checkout(branch_name)
         print("")
 
+    @staticmethod
+    def get_commit_history(repo_path: str):
+        #TODO find out a way o set the current repo use the new class repo manager
+        repo = git.Repo(repo_path)
+        branch_name = GitOperations.get_current_branch_name(repo_path)
+        return list(repo.iter_commits(branch_name, max_count=50))
+        # repo.
+        # repo.git.checkout(branch_name)
+        # print("")
+
+    @staticmethod
+    def get_current_branch_name(repo_path: str = None):
+        repo_path = repo_path if repo_path else r'C:\Users\jacob\Documents\ETE\repos\ete-sync-internal'
+        repo = git.Repo(repo_path)
+        return repo.active_branch.name
 
     @staticmethod
     def is_branch_checked_out(repo_path: str, branch_name: str):
         repo = git.Repo(repo_path)
         return repo.active_branch.name == branch_name
+
+    def get_branches_grouped_by_prefix_dict(self):
+        no_prefix = "no_prefix"
+        grouped_branches = {no_prefix: []}
+        for branch in self.repo.branches: # noqa
+            if "/" in branch.name:
+                branch_prefix, branch_name = branch.name.split("/", 1)
+                if branch_prefix not in grouped_branches:
+                    grouped_branches[branch_prefix] = []
+                grouped_branches[branch_prefix].append(branch_name)
+            else:
+                grouped_branches[no_prefix].append(branch.name)
+        return grouped_branches
+
+
+
 
     @staticmethod
     def get_current_remote_branches(repo_path):

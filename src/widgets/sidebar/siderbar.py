@@ -27,7 +27,7 @@ class Sidebar(wx.Panel):
             btn.Bind(wx.EVT_ENTER_WINDOW, self.on_hover)
             btn.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave)
             # btn.Bind(wx.EVT_BUTTON, self.on_click)
-            self.sizer.Add(btn, 0, wx.EXPAND | wx.ALL, 5)
+            self.sizer.Add(btn, 0, wx.ALL, 5)
 
         # Set the sizer at the end of the __init__ method
 
